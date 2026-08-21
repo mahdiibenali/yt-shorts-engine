@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    container_name: yt-shorts-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PEXELS_API_KEY=${PEXELS_API_KEY}
+      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
+      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PIXABAY_API_KEY=${PIXABAY_API_KEY}
+      - COVERR_API_KEY=${COVERR_API_KEY}
+      - POLLINATIONS_MODEL=${POLLINATIONS_MODEL:-openai}
+      - POLLINATIONS_API_KEY=${POLLINATIONS_API_KEY}
+      - JIMENG_BASE_URL=${JIMENG_BASE_URL}
+      - JIMENG_SESSION_ID=${JIMENG_SESSION_ID}
+      - LOG_LEVEL=info
+    volumes:
+      - ./data:/app/data
+      - ./client_secrets.json:/app/client_secrets.json:ro
+    restart: unless-stopped
+
+  worker:
+    build: .
+    container_name: yt-shorts-worker
+    command: python -m app.worker.generator
+    environment:
+      - PEXELS_API_KEY=${PEXELS_API_KEY}
+      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
+      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PIXABAY_API_KEY=${PIXABAY_API_KEY}
+      - COVERR_API_KEY=${COVERR_API_KEY}
+      - POLLINATIONS_MODEL=${POLLINATIONS_MODEL:-openai}
+      - POLLINATIONS_API_KEY=${POLLINATIONS_API_KEY}
+      - JIMENG_BASE_URL=${JIMENG_BASE_URL}
+      - JIMENG_SESSION_ID=${JIMENG_SESSION_ID}
+      - LOG_LEVEL=info
+    volumes:
+      - ./data:/app/data
+      - ./client_secrets.json:/app/client_secrets.json:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  ui:
+    build: .
+    container_name: yt-shorts-ui
+    command: streamlit run app/ui/review.py --server.port 8501 --server.address 0.0.0.0
+    environment:
+      - API_BASE=http://api:8000/api
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    restart: unless-stopped

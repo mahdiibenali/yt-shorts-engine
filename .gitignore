@@ -1,0 +1,33 @@
+# Environment
+.env
+*.pickle
+client_secrets.json
+
+# Data
+data/
+!data/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.so
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+temp/
+*.mp4
+*.mp3
+*.wav
+*.srt
