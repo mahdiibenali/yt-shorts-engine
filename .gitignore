@@ -31,3 +31,7 @@ temp/
 *.mp3
 *.wav
 *.srt
+
+# Python\n.pytest_cache/
+.env
+*.db
